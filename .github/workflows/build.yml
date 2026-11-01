@@ -1,0 +1,31 @@
+name: Build and validate
+on: [push, pull_request]
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: dotnet build IndustrialHmi.sln -c Release
+      - run: dotnet test tests/IndustrialHmi.Tests -c Release --no-build --logger trx --results-directory artifacts/test-results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: protocol-test-results
+          path: artifacts/test-results
+  windows-ui:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: dotnet build IndustrialHmi.sln -c Release
+      - run: dotnet run --project tests/IndustrialHmi.WpfSmoke -c Release --no-build
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wpf-screenshots
+          path: artifacts/screenshots

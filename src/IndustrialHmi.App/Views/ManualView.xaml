@@ -1,0 +1,21 @@
+<UserControl x:Class="IndustrialHmi.App.Views.ManualView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:c="clr-namespace:IndustrialHmi.App.Controls" xmlns:m="clr-namespace:IndustrialHmi.Core.Models;assembly=IndustrialHmi.Core">
+<StackPanel><TextBlock Text="手动调试" Style="{StaticResource Title}"/><TextBlock Text="仅在手动模式、设备就绪且联锁满足时允许动作。" Style="{StaticResource MutedText}" Margin="0,0,0,24"/>
+ <Border Background="#332A1D" BorderBrush="#795A2E" BorderThickness="1" Padding="16" CornerRadius="8" Margin="0,0,0,20"><TextBlock Text="现场操作前确认运动区域无人。软件暂停不是安全急停；急停必须使用实体安全回路。" Foreground="#F2C88B" TextWrapping="Wrap"/></Border>
+ <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="1.2*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+  <Border Style="{StaticResource Card}" Margin="0,0,20,0"><StackPanel><TextBlock Text="伺服轴  X01" Style="{StaticResource Title}"/><TextBlock Text="JOG CONTROL / 按住点动" Style="{StaticResource MutedText}" Margin="0,0,0,24"/>
+   <UniformGrid Columns="2"><StackPanel><TextBlock Text="当前位置 / mm" Style="{StaticResource MutedText}"/><TextBlock Text="{Binding Position, StringFormat={}{0:F3}}" FontSize="34" Margin="0,8,0,20"/></StackPanel><StackPanel><TextBlock Text="实际速度 / mm·s⁻¹" Style="{StaticResource MutedText}"/><TextBlock Text="{Binding Velocity, StringFormat={}{0:F2}}" FontSize="34" Margin="0,8,0,20"/></StackPanel></UniformGrid>
+   <DockPanel Margin="0,0,0,10"><TextBlock Text="点动速度"/><TextBlock Text="{Binding JogSpeed, StringFormat={}{0:F1} mm/s}" HorizontalAlignment="Right" Foreground="{StaticResource Accent}"/></DockPanel>
+   <Slider Minimum="0.1" Maximum="50" Value="{Binding JogSpeed}" TickFrequency="1" IsEnabled="{Binding ManualAllowed}" Margin="0,8,0,24"/>
+   <UniformGrid Columns="2"><c:HoldJogButton Content="−  X  反向" Positive="False" IsEnabled="{Binding ManualAllowed}" Height="70" Margin="0,0,12,0"/><c:HoldJogButton Content="＋  X  正向" Positive="True" IsEnabled="{Binding ManualAllowed}" Height="70"/></UniformGrid>
+   <TextBlock Text="鼠标按住或聚焦后按住空格 / Enter。松开、失焦、切页即撤销；单次点动最多 5 秒，超时后需松开重按。速度在下一次按下时生效。" Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,18,0,0"/>
+  </StackPanel></Border>
+  <Border Grid.Column="1" Style="{StaticResource Card}"><StackPanel><TextBlock Text="定位气缸  CY01" Style="{StaticResource Title}"/><TextBlock Text="DOUBLE ACTING CYLINDER" Style="{StaticResource MutedText}"/>
+   <Viewbox Height="110" Margin="0,24"><Canvas Width="300" Height="90"><Rectangle Canvas.Left="24" Canvas.Top="20" Width="158" Height="48" RadiusX="5" RadiusY="5" Fill="#263C4D" Stroke="#66829A" StrokeThickness="2"/><Rectangle Canvas.Left="150" Canvas.Top="35" Width="120" Height="18" Fill="#647C8D"/><Rectangle Canvas.Left="60" Canvas.Top="25" Width="12" Height="38" Fill="#42D6B0"/></Canvas></Viewbox>
+   <DockPanel Margin="0,0,0,12"><Ellipse Width="9" Height="9" Fill="{Binding CylinderHome, Converter={StaticResource SignalBrush}}" Margin="0,0,10,0"/><TextBlock Text="原位反馈"/></DockPanel><DockPanel Margin="0,0,0,24"><Ellipse Width="9" Height="9" Fill="{Binding CylinderWork, Converter={StaticResource SignalBrush}}" Margin="0,0,10,0"/><TextBlock Text="到位反馈"/></DockPanel>
+   <UniformGrid Columns="2"><Button Content="← 缩回" Command="{Binding RetractCommand}" IsEnabled="{Binding ManualAllowed}" Margin="0,0,12,0"/><Button Content="伸出 →" Command="{Binding ExtendCommand}" IsEnabled="{Binding ManualAllowed}"/></UniformGrid>
+   <TextBlock Text="发送 100 ms 请求脉冲，由 PLC 执行动作及超时检测。示意图不表示气缸实际位置。" Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,18,0,0"/>
+  </StackPanel></Border>
+ </Grid>
+ <Border Style="{StaticResource Card}" Margin="0,20,0,0" Visibility="{Binding IsSimulation, Converter={StaticResource BoolVisibility}}"><StackPanel><TextBlock Text="模拟面板" Style="{StaticResource Title}"/><TextBlock Text="用于验证模式切换与故障联锁，仅在模拟模式显示。恢复安全条件后，需在总览页复位。" Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,0,0,16"/><WrapPanel><Button Content="切换手动 / 自动" Command="{Binding ToggleSimulationModeCommand}" Margin="0,0,12,8"/><Button Content="打开 / 关闭安全门" Command="{Binding ToggleSimulationDoorCommand}" Margin="0,0,12,8"/><Button Content="触发 / 释放急停" Command="{Binding ToggleSimulationEStopCommand}" Margin="0,0,0,8"/></WrapPanel></StackPanel></Border>
+</StackPanel>
+</UserControl>
